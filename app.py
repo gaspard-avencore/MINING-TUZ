@@ -8,22 +8,30 @@ import webbrowser
 import utils.parameters as parameters
 import utils.processing as processing
 
+import subprocess
 
-PORT = 8001
-DIRECTORY = "custom_app"
+# PORT = 8001
+# DIRECTORY = "custom_app"
 
-class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, directory=DIRECTORY, **kwargs)
+# class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, directory=DIRECTORY, **kwargs)
 
-def start_server():
-    handler = CustomHTTPRequestHandler
-    with socketserver.TCPServer(("", PORT), handler) as httpd:
-        httpd.serve_forever()
+# def start_server():
+#     handler = CustomHTTPRequestHandler
+#     with socketserver.TCPServer(("", PORT), handler) as httpd:
+#         httpd.serve_forever()
+
+# def open_custom_app():
+#     url = f"http://localhost:{PORT}"
+#     webbrowser.open_new_tab(url)
+
+
+def start_flask_server():
+    subprocess.Popen(['python', 'flask_server.py'])
 
 def open_custom_app():
-    url = f"http://localhost:{PORT}"
-    webbrowser.open_new_tab(url)
+    start_flask_server()
 
 def launch_simulation(hexagons_to_draw, hexagonal_structure, hex_size, vertices, tuz_capa=None):
     structure = processing.plot_hexagonal_structure(hex_size, hexagons_to_draw)
