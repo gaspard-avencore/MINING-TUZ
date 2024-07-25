@@ -100,6 +100,7 @@ with tab1:
         content = mine_geography.read().decode("utf-8")
         hexagons_to_draw = ast.literal_eval("["+content+"]")
         hexagons_to_draw = [hex_coords + (0, ) for hex_coords in hexagons_to_draw]
+        st.session_state.hexagons_to_draw = hexagons_to_draw
 
         hex_size = st.number_input("Cells size", value=40, min_value=1, step=1)
 
@@ -107,16 +108,18 @@ with tab1:
             st.session_state.hex_size = hex_size
             hexagonal_structure = processing.get_hexagonal_structure(hex_size, hexagons_to_draw)
             st.session_state.hexagonal_structure = hexagonal_structure
-            progress = 0.
-            progress_bar = st.progress(progress)
-            for result in processing.get_vertices(hexagonal_structure):
-                if type(result)==float:
-                    progress = result
-                    progress_bar.progress(progress)
-                else : 
-                    progress_bar.progress(1.)
-                    vertices = result
-                    st.session_state.vertices = vertices
+            
+            if "vertices" not in st.session_state:
+                progress = 0.
+                progress_bar = st.progress(progress)
+                for result in processing.get_vertices(hexagonal_structure):
+                    if type(result)==float:
+                        progress = result
+                        progress_bar.progress(progress)
+                    else : 
+                        progress_bar.progress(1.)
+                        vertices = result
+                        st.session_state.vertices = vertices
         
         # launch and compute results
         if "hexagonal_structure" in st.session_state and "vertices" in st.session_state:
@@ -151,7 +154,9 @@ with tab1:
                 with st.expander("TUZ sizes"):
                     st.pyplot(st.session_state.tuz_sizes, use_container_width=True)
                 with st.expander("Summary"):
-                    st.write(st.session_state.summary_str)
+                    lines = st.session_state.summary_str.split('\n')
+                    for line in lines:
+                        st.write(line)
             
             if st.session_state.show_result=="tuning" and "stacked_costs_fig" in st.session_state and "avg_distances_fig" in st.session_state :
                 with st.expander("Comparison"):

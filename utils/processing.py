@@ -281,11 +281,11 @@ def print_summary(hexagons_to_draw, tuzs, costs, injection_lines, extraction_lin
     n_hex_y = max(hexagon[1] for hexagon in hexagons_to_draw) - min(hexagon[1] for hexagon in hexagons_to_draw) + 1
     summary_str+=f'{len(tuzs)} TUZs\n'
     summary_str+=f'Grid : {len(hexagons_to_draw)} cells ({n_hex_x} x {n_hex_y})\n'
-    summary_str+='\n'
+    summary_str+='\n\n'
     
-    summary_str+=f'• {round(np.mean([len(tuz["extraction_points"]) for tuz in tuzs.values()]), 1)} extraction points on average\n'
-    summary_str+=f'• {round(np.mean([len(tuz["injection_points"]) for tuz in tuzs.values()]), 1)} injection points on average\n'
-    summary_str+='\n'
+    summary_str+=f'• {round(np.mean([len(tuz["extraction_points"]) for tuz in tuzs.values()]), 1)} extraction points on average\n\n'
+    summary_str+=f'• {round(np.mean([len(tuz["injection_points"]) for tuz in tuzs.values()]), 1)} injection points on average\n\n'
+    summary_str+='\n\n'
 
     # costs
     (
@@ -297,40 +297,40 @@ def print_summary(hexagons_to_draw, tuzs, costs, injection_lines, extraction_lin
     fixed_cost = fixed_original + fixed_additional
     variable_costs = total_cost - fixed_cost
     
-    summary_str+=f'• Average TUZ cost : {format_number(round(total_cost / len(tuzs)))} €\n'
-    summary_str+=f'   -> {round(100 * fixed_cost / total_cost)} % fixed costs\n'
-    summary_str+=f'   -> {round(100 * variable_costs / total_cost)} % variable costs\n'
-    summary_str+='\n'
+    summary_str+=f'• Average TUZ cost : {format_number(round(total_cost / len(tuzs)))} €\n\n'
+    summary_str+=f'   --> {round(100 * fixed_cost / total_cost)} % fixed costs\n\n'
+    summary_str+=f'   --> {round(100 * variable_costs / total_cost)} % variable costs\n\n'
+    summary_str+='\n\n'
 
     # avg distances 
     injection_distances, extraction_distances = [], []
     for injection_line in injection_lines.values():
-            distance = get_distance(
-                injection_line["x_from"], 
-                injection_line["y_from"], 
-                injection_line["z_from"], 
-                injection_line["x_to"], 
-                injection_line["y_to"], 
-                injection_line["z_to"], 
-            )
-            injection_distances.append(distance)
+        distance = get_distance(
+            injection_line["x_from"], 
+            injection_line["y_from"], 
+            injection_line["z_from"], 
+            injection_line["x_to"], 
+            injection_line["y_to"], 
+            injection_line["z_to"], 
+        )
+        injection_distances.append(distance)
     for extraction_line in extraction_lines.values():
-            distance = get_distance(
-                extraction_line["x_from"], 
-                extraction_line["y_from"], 
-                extraction_line["z_from"], 
-                extraction_line["x_to"], 
-                extraction_line["y_to"], 
-                extraction_line["z_to"], 
-            )
-            extraction_distances.append(distance)
-    summary_str+=f'• Average injection line length : {round(np.mean(injection_distances), 1)} m\n'
-    summary_str+=f'• Average extraction line length : {round(np.mean(extraction_distances), 1)} m\n'
+        distance = get_distance(
+            extraction_line["x_from"], 
+            extraction_line["y_from"], 
+            extraction_line["z_from"], 
+            extraction_line["x_to"], 
+            extraction_line["y_to"], 
+            extraction_line["z_to"], 
+        )
+        extraction_distances.append(distance)
+    summary_str+=f'• Average injection line length : {round(np.mean(injection_distances), 1)} m\n\n'
+    summary_str+=f'• Average extraction line length : {round(np.mean(extraction_distances), 1)} m\n\n'
     summary_str+='\n'
 
-    summary_str+='Value :\n'
-    summary_str+=f'• Total : {format_number(round(value))} € per year\n'
-    summary_str+=f'• {format_number(round(value / len(hexagons_to_draw)))} € per cell per year\n'
+    summary_str+='Value :\n\n'
+    summary_str+=f'• Total : {format_number(round(value))} € per year\n\n'
+    summary_str+=f'• {format_number(round(value / len(hexagons_to_draw)))} € per cell per year\n\n'
     
     return summary_str
 
