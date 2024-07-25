@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import ast
 import math
 import threading
@@ -84,78 +85,80 @@ hide_streamlit_style = '''
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 st.markdown(hide_decoration_bar_style, unsafe_allow_html=True)
 
-
 st.title("TUZ Modeling Tool")
+tab1, tab2 = st.tabs(["Home", "Mine geography"])
 
-if st.button("Configure mine geography"):
-    threading.Thread(target=start_server, daemon=True).start()
-    open_custom_app()
-    st.success(f"Custom app is being served at http://localhost:{PORT}")
+with tab1:
 
-mine_geography = st.file_uploader("Upload mine geography", type="txt")
-if mine_geography is not None:
-    content = mine_geography.read().decode("utf-8")
-    hexagons_to_draw = ast.literal_eval("["+content+"]")
-    hexagons_to_draw = [hex_coords + (0, ) for hex_coords in hexagons_to_draw]
+    # if st.button("Configure mine geography"):
+        # threading.Thread(target=start_server, daemon=True).start()
+        # open_custom_app()
+        # st.success(f"Custom app is being served at http://localhost:{PORT}")
 
-    hex_size = st.number_input("Cells size", value=40, min_value=1, step=1)
+    mine_geography = st.file_uploader("Upload mine geography", type="txt")
+    if mine_geography is not None:
+        content = mine_geography.read().decode("utf-8")
+        hexagons_to_draw = ast.literal_eval("["+content+"]")
+        hexagons_to_draw = [hex_coords + (0, ) for hex_coords in hexagons_to_draw]
 
-    if hex_size:
-        st.session_state.hex_size = hex_size
-        hexagonal_structure = processing.get_hexagonal_structure(hex_size, hexagons_to_draw)
-        st.session_state.hexagonal_structure = hexagonal_structure
-        progress = 0.
-        progress_bar = st.progress(progress)
-        for result in processing.get_vertices(hexagonal_structure):
-            if type(result)==float:
-                progress = result
-                progress_bar.progress(progress)
-            else : 
-                progress_bar.progress(1.)
-                vertices = result
-                st.session_state.vertices = vertices
-    
-    
-    # launch and compute results
-    
-    if "hexagonal_structure" in st.session_state and "vertices" in st.session_state:
-        hexagonal_structure = st.session_state["hexagonal_structure"]
-        vertices = st.session_state["vertices"]
+        hex_size = st.number_input("Cells size", value=40, min_value=1, step=1)
+
+        if hex_size:
+            st.session_state.hex_size = hex_size
+            hexagonal_structure = processing.get_hexagonal_structure(hex_size, hexagons_to_draw)
+            st.session_state.hexagonal_structure = hexagonal_structure
+            progress = 0.
+            progress_bar = st.progress(progress)
+            for result in processing.get_vertices(hexagonal_structure):
+                if type(result)==float:
+                    progress = result
+                    progress_bar.progress(progress)
+                else : 
+                    progress_bar.progress(1.)
+                    vertices = result
+                    st.session_state.vertices = vertices
         
-        col1, col2 = st.columns(2)
-        target_tuz_capa = col1.number_input("Tuz Capacity", value=17, min_value=1, step=1)
-        launch_btn_single = col1.button("Launch simulation", use_container_width=True, type="primary")
+        # launch and compute results
+        if "hexagonal_structure" in st.session_state and "vertices" in st.session_state:
+            hexagonal_structure = st.session_state["hexagonal_structure"]
+            vertices = st.session_state["vertices"]
+            
+            col1, col2 = st.columns(2)
+            target_tuz_capa = col1.number_input("Tuz Capacity", value=17, min_value=1, step=1)
+            launch_btn_single = col1.button("Launch simulation", use_container_width=True, type="primary")
+            
+            col2_1, col2_2 = col2.columns(2)
+            col2_1.number_input("Min Capa", value=10, min_value=1, step=1)
+            col2_2.number_input("Max Capa", value=60, min_value=1, step=1)
+            launch_btn_tuning = col2.button("Launch tuning", use_container_width=True, type="primary")
+            
+            if target_tuz_capa and launch_btn_single:
+                launch_simulation(hexagons_to_draw, hexagonal_structure, hex_size, vertices, tuz_capa=target_tuz_capa)
+                st.session_state.show_result = "single"
+            elif launch_btn_tuning:
+                launch_simulation(hexagons_to_draw, hexagonal_structure, hex_size, vertices)
+                st.session_state.show_result = "tuning"
         
-        col2_1, col2_2 = col2.columns(2)
-        col2_1.number_input("Min Capa", value=10, min_value=1, step=1)
-        col2_2.number_input("Max Capa", value=60, min_value=1, step=1)
-        launch_btn_tuning = col2.button("Launch tuning", use_container_width=True, type="primary")
-        
-        if target_tuz_capa and launch_btn_single:
-            launch_simulation(hexagons_to_draw, hexagonal_structure, hex_size, vertices, tuz_capa=target_tuz_capa)
-            st.session_state.show_result = "single"
-        elif launch_btn_tuning:
-            launch_simulation(hexagons_to_draw, hexagonal_structure, hex_size, vertices)
-            st.session_state.show_result = "tuning"
-    
-    
-    # display results
-    
-    if "show_result" in st.session_state :
-        if st.session_state.show_result=="single" and all([x in st.session_state for x in ["structure_with_tuzs", "structure", "summary_str", "tuz_sizes"]]):
-            with st.expander("Map"):
-                display_tuzs = st.toggle("Display TUZs")
-                if display_tuzs:
-                    st.pyplot(st.session_state.structure_with_tuzs, use_container_width=False)
-                else: 
-                    st.pyplot(st.session_state.structure, use_container_width=False)
-            with st.expander("TUZ sizes"):
-                st.pyplot(st.session_state.tuz_sizes, use_container_width=True)
-            with st.expander("Summary"):
-                st.write(st.session_state.summary_str)
-        
-        if st.session_state.show_result=="tuning" and "stacked_costs_fig" in st.session_state and "avg_distances_fig" in st.session_state :
-            with st.expander("Comparison"):
-                st.pyplot(st.session_state.stacked_costs_fig)
-                st.pyplot(st.session_state.avg_distances_fig)
-    
+        # display results
+        if "show_result" in st.session_state :
+            if st.session_state.show_result=="single" and all([x in st.session_state for x in ["structure_with_tuzs", "structure", "summary_str", "tuz_sizes"]]):
+                with st.expander("Map"):
+                    display_tuzs = st.toggle("Display TUZs")
+                    if display_tuzs:
+                        st.pyplot(st.session_state.structure_with_tuzs, use_container_width=False)
+                    else: 
+                        st.pyplot(st.session_state.structure, use_container_width=False)
+                with st.expander("TUZ sizes"):
+                    st.pyplot(st.session_state.tuz_sizes, use_container_width=True)
+                with st.expander("Summary"):
+                    st.write(st.session_state.summary_str)
+            
+            if st.session_state.show_result=="tuning" and "stacked_costs_fig" in st.session_state and "avg_distances_fig" in st.session_state :
+                with st.expander("Comparison"):
+                    st.pyplot(st.session_state.stacked_costs_fig)
+                    st.pyplot(st.session_state.avg_distances_fig)
+
+with tab2:
+    with open("custom_app/index.html", "r", encoding="utf-8") as html_file:
+        custom_html = html_file.read()
+    components.html(custom_html, height=600)
