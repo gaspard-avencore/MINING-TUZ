@@ -14,3 +14,5 @@ You can also create a new environment by running :
 conda env create -f environment.yml
 conda activate mining-tuz
 ```
+
+

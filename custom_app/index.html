@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hexagonal Grid</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="controls">
+        <div class="input-row">
+            <div class="input-group">
+                <label for="rows">Rows:</label>
+                <input type="number" id="rows" value="20" min="1">
+            </div>
+            <div class="input-group">
+                <label for="columns">Columns:</label>
+                <input type="number" id="columns" value="100" min="1">
+            </div>
+        </div>
+        <button id="generate-grid">Generate Grid</button>
+    </div>
+    <div class="grid-container">
+        <div class="grid"></div>
+    </div>
+    <button id="download-cells" style="display: none;">Download Cells</button>
+    <script src="script.js"></script>
+</body>
+</html>
