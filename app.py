@@ -10,17 +10,17 @@ import utils.processing as processing
 
 import subprocess
 
-# PORT = 8001
+PORT = 8001
 # DIRECTORY = "custom_app"
 
-# class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(*args, directory=DIRECTORY, **kwargs)
+class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, directory=DIRECTORY, **kwargs)
 
-# def start_server():
-#     handler = CustomHTTPRequestHandler
-#     with socketserver.TCPServer(("", PORT), handler) as httpd:
-#         httpd.serve_forever()
+def start_server():
+    handler = CustomHTTPRequestHandler
+    with socketserver.TCPServer(("", PORT), handler) as httpd:
+        httpd.serve_forever()
 
 # def open_custom_app():
 #     url = f"http://localhost:{PORT}"
