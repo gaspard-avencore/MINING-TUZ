@@ -5,7 +5,7 @@ from threading import Timer
 
 app = Flask(__name__)
 DIRECTORY = 'custom_app'
-PORT = 8000
+PORT = 8001
 
 @app.route('/')
 def serve_index():

@@ -11,7 +11,7 @@ import utils.processing as processing
 import subprocess
 
 PORT = 8001
-# DIRECTORY = "custom_app"
+DIRECTORY = "custom_app"
 
 class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
